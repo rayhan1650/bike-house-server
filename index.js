@@ -24,10 +24,18 @@ async function run() {
 
     //get inventory items from mongoDb
     app.get("/inventories", async (req, res) => {
-      const query = {};
-      const cursor = bikeCollection.find(query);
-      const inventories = await cursor.toArray();
-      res.send(inventories);
+      if (req.query.email) {
+        const email = req.query.email;
+        const query = { email: email };
+        const cursor = bikeCollection.find(query);
+        const inventories = await cursor.toArray();
+        res.send(inventories);
+      } else {
+        const query = {};
+        const cursor = bikeCollection.find(query);
+        const inventories = await cursor.toArray();
+        res.send(inventories);
+      }
     });
 
     //get single item by id
