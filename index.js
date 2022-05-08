@@ -71,6 +71,14 @@ async function run() {
       const result = await bikeCollection.insertOne(newItem);
       res.send(result);
     });
+
+    //delete a user
+    app.delete("/inventory/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await bikeCollection.deleteOne(query);
+      res.send(result);
+    });
   } finally {
   }
 }
