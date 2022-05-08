@@ -46,6 +46,25 @@ async function run() {
       res.send(inventory);
     });
 
+    //update stock
+    app.put("/inventory/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateQuantity = req.body.quantity;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          quantity: updateQuantity,
+        },
+      };
+      const result = await bikeCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
+
     //post data
     app.post("/inventories", async (req, res) => {
       const newItem = req.body;
