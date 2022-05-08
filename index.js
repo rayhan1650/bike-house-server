@@ -37,6 +37,13 @@ async function run() {
       const inventory = await bikeCollection.findOne(query);
       res.send(inventory);
     });
+
+    //post data
+    app.post("/inventories", async (req, res) => {
+      const newItem = req.body;
+      const result = await bikeCollection.insertOne(newItem);
+      res.send(result);
+    });
   } finally {
   }
 }
