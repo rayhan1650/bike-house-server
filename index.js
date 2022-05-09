@@ -32,14 +32,34 @@ async function run() {
       res.send({ accessToken });
     });
 
+    function verifyJWT(req, res, next) {
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        return res.status(401).send({ message: "Unauthorized access" });
+      }
+      const token = authHeader.split(" ")[1];
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+          return res.status(403).send({ message: "Forbidden access" });
+        }
+        req.decoded = decoded;
+        next();
+      });
+    }
+
     //get inventory items from mongoDb
-    app.get("/inventories", async (req, res) => {
-      if (req.query.email) {
-        const email = req.query.email;
-        const query = { email: email };
-        const cursor = bikeCollection.find(query);
-        const inventories = await cursor.toArray();
-        res.send(inventories);
+    app.get("/inventories", verifyJWT, async (req, res) => {
+      const decodedEmail = req.decoded.email;
+      const email = req.query.email;
+      if (email) {
+        if (email === decodedEmail) {
+          const query = { email: email };
+          const cursor = bikeCollection.find(query);
+          const inventories = await cursor.toArray();
+          res.send(inventories);
+        } else {
+          res.status(403).send({ message: "Forbidden access" });
+        }
       } else {
         const query = {};
         const cursor = bikeCollection.find(query);
