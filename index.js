@@ -48,7 +48,15 @@ async function run() {
     }
 
     //get inventory items from mongoDb
-    app.get("/inventories", verifyJWT, async (req, res) => {
+    app.get("/inventories", async (req, res) => {
+      const query = {};
+      const cursor = bikeCollection.find(query);
+      const inventories = await cursor.toArray();
+      res.send(inventories);
+    });
+
+    //get myitems data
+    app.get("/myitems", verifyJWT, async (req, res) => {
       const decodedEmail = req.decoded.email;
       const email = req.query.email;
       if (email) {
@@ -60,11 +68,6 @@ async function run() {
         } else {
           res.status(403).send({ message: "Forbidden access" });
         }
-      } else {
-        const query = {};
-        const cursor = bikeCollection.find(query);
-        const inventories = await cursor.toArray();
-        res.send(inventories);
       }
     });
 
